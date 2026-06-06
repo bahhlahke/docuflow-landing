@@ -758,7 +758,7 @@
                 <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-3">Input</div>
                 <div class="text-gray-400 text-xs mb-2">invoice.pdf — 2.4MB</div>
                 <div class="p-3 bg-gray-800/60 rounded-lg border border-gray-700/50">
-                  <div class="text-gray-300"><span class="text-purple-400">curl</span> <span class="text-emerald-300">-X POST api.docuflow.ai/v1/documents</span></div>
+                  <div class="text-gray-300"><span class="text-purple-400">curl</span> <span class="text-emerald-300">-X POST api.docuflow.dev/v1/documents</span></div>
                   <div class="text-gray-500 mt-1">  <span class="text-blue-400">-H</span> <span class="text-amber-300">"Authorization: Bearer sk_live_...</span>
                   <div class="text-gray-500">  <span class="text-blue-400">-F</span> <span class="text-amber-300">"file=@invoice.pdf"</span></div>
                 </div>
@@ -2990,7 +2990,18 @@
     // ─── State ────────────────────────────────────────────
     let selectedFile = null;
     let isProcessing = false;
-    const API_BASE = 'https://docuflow-production-6ff0.up.railway.app';
+    // Production API endpoint. Switches from Railway's default *.up.railway.app URL
+    // to the custom domain `api.docuflow.dev` once DNS is wired in Cloudflare.
+    // Override at runtime via ?api=... query param for testing.
+    const API_BASE = (() => {
+      const params = new URLSearchParams(window.location.search);
+      const override = params.get('api');
+      if (override) return override;
+      if (window.location.hostname.endsWith('.docuflow.dev')) {
+        return 'https://api.docuflow.dev';
+      }
+      return 'https://docuflow-production-6ff0.up.railway.app';
+    })();
 
     // ─── Pulsing border animation style ───────────────────
     const styleSheet = document.createElement('style');
